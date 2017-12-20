@@ -73,7 +73,7 @@
 }
 
 - (void) closeInApp {
-    [self dismissViewControllerAnimated:NO completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (CGFloat) topMargin {
@@ -85,11 +85,11 @@
 }
 
 - (void)makeBottomBar   {
-    _bottomBar = [[UIView alloc] initWithFrame:CGRectMake(0, kThirdPartyMainWindowHeight - kBottomBarHeight, kThirdPartyMainWindowWidth, kBottomBarHeight)];
+    _bottomBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kThirdPartyMainWindowWidth, kBottomBarHeight)];
     _bottomBar.backgroundColor = [UIColor whiteColor];
     [_mainView addSubview:_bottomBar];
     
-    _bottomBarTopDivLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _bottomBar.frame.size.width, 1)];
+    _bottomBarTopDivLine = [[UIView alloc] initWithFrame:CGRectMake(0, kBottomBarHeight, _bottomBar.frame.size.width, 1)];
     _bottomBarTopDivLine.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _bottomBarTopDivLine.backgroundColor = [UIColor colorWithRed:0xC6/255.0 green:0xC6/255.0 blue:0xC6/255.0 alpha:1.0];
     [_bottomBar addSubview:_bottomBarTopDivLine];
@@ -99,10 +99,11 @@
     CGFloat btnWidth = CGRectGetWidth(_bottomBar.frame) / numberOfBtn;
     CGFloat btnHeight = CGRectGetHeight(_bottomBar.frame) - CGRectGetHeight(_bottomBarTopDivLine.bounds);
     
-    CGFloat closeBtnOriginX = btnWidth * 3;
-    _closeBt = [[UIButton alloc] initWithFrame:CGRectMake(closeBtnOriginX, 0, btnWidth, btnHeight)];
+    CGFloat closeBtnOriginX = kThirdPartyMainWindowWidth - 48;
+    UIImage *closeImage = [UIImage imageNamed:@"NaverAuth.bundle/btn_notice_close_normal.png"];
+    _closeBt = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, closeImage.size.width, btnHeight)];
 
-    [_closeBt setImage:[UIImage imageNamed:@"NaverAuth.bundle/btn_notice_close_normal.png"] forState:UIControlStateNormal];
+    [_closeBt setImage:closeImage forState:UIControlStateNormal];
     [_closeBt addTarget:self action:@selector(closeBtAction:) forControlEvents:UIControlEventTouchUpInside];
     [_bottomBar addSubview:_closeBt];
 }
@@ -148,8 +149,7 @@
     bannerMessage.textAlignment = NSTextAlignmentLeft;
     bannerMessage.lineBreakMode = NSLineBreakByWordWrapping;
     bannerMessage.numberOfLines = 0;
-    // bannerMessage.text = kNaverAuthBannerMessage; // Crash : MOOON 여기 크래쉬는 나중에 잡자.
-    bannerMessage.text = @"Get NAVER App and sign in faster";
+    bannerMessage.text = kNaverAuthBannerMessage;
     
     CGSize bannerMessageSize = [NaverThirdPartyLoginConnection sizeWithText:bannerMessage.text withFont:bannerMessage.font];
     
@@ -161,9 +161,7 @@
     downloadLinkMessage.lineBreakMode = NSLineBreakByWordWrapping;
     downloadLinkMessage.numberOfLines = 0;
   
-    // Crash : MOOON 여기 크래쉬는 나중에 잡자.
-    // NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:kNaverAuthBannerDownloadLink];
-    NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:@"Download App"];
+     NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:kNaverAuthBannerDownloadLink];
     [attributeString addAttribute:NSUnderlineStyleAttributeName
                             value:[NSNumber numberWithInt:1]
                             range:(NSRange){0,[attributeString length]}];
@@ -271,21 +269,23 @@
     
     _mainView.frame = CGRectMake(0, [self topMargin], mainWindowSize.width, mainWindowSize.height);
     if ([_thirdPartyLoginConn isPossibleToOpenNaverApp] || YES == _isCloseBannerView) {
-        _bannerView.frame = CGRectMake(0, 0, mainWindowSize.width, 0);
+        _bannerView.frame = CGRectMake(0, kBottomBarHeight, mainWindowSize.width, 0);
         _bannerView.hidden = YES;
     } else {
-        _bannerView.frame = CGRectMake(0, 0, mainWindowSize.width, kThirdPartyBannerHeight);
+        _bannerView.frame = CGRectMake(0, kBottomBarHeight, mainWindowSize.width, kThirdPartyBannerHeight);
         _bannerView.hidden = NO;
         _bannerCloseButton.frame = CGRectMake(kThirdPartyMainWindowWidth - kThirdPartyBannerHeight, 0, kThirdPartyBannerHeight, kThirdPartyBannerHeight);
     }
-    _webView.frame = CGRectMake(0, CGRectGetMaxY(_bannerView.frame), mainWindowSize.width, mainWindowSize.height - kBottomBarHeight - CGRectGetHeight(_bannerView.frame));
-    _bottomBar.frame = CGRectMake(0, mainWindowSize.height - kBottomBarHeight, mainWindowSize.width, kBottomBarHeight);
-    _bottomBarTopDivLine.frame = CGRectMake(0, 0, mainWindowSize.width, 1);
-    
+    _webView.frame = CGRectMake(0, CGRectGetMaxY(_bannerView.frame), mainWindowSize.width, mainWindowSize.height - CGRectGetHeight(_bannerView.frame));
+    _bottomBar.frame = CGRectMake(0, 0, mainWindowSize.width, kBottomBarHeight);
+    _bottomBarTopDivLine.frame = CGRectMake(0, kBottomBarHeight, _bottomBar.frame.size.width, 1);
+
     int btnWidth = mainWindowSize.width / 4.0;
     int btnHeight = CGRectGetHeight(_bottomBar.frame) - CGRectGetHeight(_bottomBarTopDivLine.frame);
     
-    _closeBt.frame = CGRectMake(btnWidth * 3, CGRectGetHeight(_bottomBarTopDivLine.frame), btnWidth, btnHeight);
+    UIImage *closeImage = [UIImage imageNamed:@"NaverAuth.bundle/btn_notice_close_normal.png"];
+
+    _closeBt.frame = CGRectMake(kThirdPartyMainWindowWidth - closeImage.size.width - 8, CGRectGetHeight(_bottomBarTopDivLine.frame), closeImage.size.width, btnHeight);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -403,6 +403,7 @@
 
 - (void) closeByUserCancel {
     [[NaverThirdPartyLoginConnection getSharedInstance] loginFailWithErrorCode:CANCELBYUSER];
+    [[NaverThirdPartyLoginConnection getSharedInstance].delegate oauth20ConnectionDidFailWithError:CANCELBYUSER];
     [self closeInApp];
 }
 
@@ -412,12 +413,9 @@
 
 - (void) errorStateCode {
     [[NaverThirdPartyLoginConnection getSharedInstance] loginFailWithErrorCode:UNAUTHORIZEDCLIENT];
-    NSLog(@"not valid state");
-    NSLog(@"state code is invalid!");
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-//    NSLog(@"request url = [%@]", [request.URL absoluteString]);
     
     if ([request respondsToSelector:@selector(setValue:forHTTPHeaderField:)]) {
         NSString *original_ua = [[request valueForHTTPHeaderField:@"User-Agent"] copy];

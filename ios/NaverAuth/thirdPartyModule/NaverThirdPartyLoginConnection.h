@@ -92,6 +92,6 @@
 - (void)oauth20ConnectionDidFinishRequestACTokenWithAuthCode;
 - (void)oauth20ConnectionDidFinishRequestACTokenWithRefreshToken;
 - (void)oauth20ConnectionDidFinishDeleteToken;
-- (void)oauth20Connection:(NaverThirdPartyLoginConnection *)oauthConnection didFailWithError:(NSError *)error;
+- (void)oauth20ConnectionDidFailWithError:(THIRDPARTYLOGIN_RECEIVE_TYPE)error;
 @end
 
