@@ -93,6 +93,7 @@ public class RNNaverLoginModule extends ReactContextBaseJavaModule {
                     String errCode = mOAuthLoginModule.getLastErrorCode(reactContext).getCode();
                     String errDesc = mOAuthLoginModule.getLastErrorDesc(reactContext);
                     Log.e(TAG, "errCode: " + errCode + ", errDesc: " + errDesc);
+                    cb.invoke(errCode, null);
                   }
                 }
               }
