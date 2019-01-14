@@ -17,7 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class RNNaverLoginModule extends ReactContextBaseJavaModule {
-  final String TAG = "ReactNaverModule";
+  final String TAG = "RNNaverLogin";
 
   private final ReactApplicationContext reactContext;
   private OAuthLogin mOAuthLoginModule;
@@ -47,6 +47,7 @@ public class RNNaverLoginModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void logout() {
+    mOAuthLoginModule = OAuthLogin.getInstance();
     mOAuthLoginModule.logout(reactContext);
   }
 
